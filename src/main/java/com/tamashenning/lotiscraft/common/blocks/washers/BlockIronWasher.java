@@ -2,12 +2,16 @@ package com.tamashenning.lotiscraft.common.blocks.washers;
 
 import com.tamashenning.lotiscraft.LotisCraftCreativeTabs;
 import com.tamashenning.lotiscraft.common.blocks.BlockTileBase;
+import com.tamashenning.lotiscraft.common.inventory.IInventoryHandler;
 import com.tamashenning.lotiscraft.common.tileentities.washers.TileEntityIronWasher;
+import com.tamashenning.lotiscraft.common.util.InventoryHelper;
 import com.tamashenning.lotiscraft.common.util.TileHelper;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -66,13 +70,17 @@ public class BlockIronWasher extends BlockTileBase {
         IFluidHandler tank = (IFluidHandler) te;
         side = side.getOpposite();
 
-        if (heldItem == null) {
+        // just testing here...
+        IInventory inv =  (IInventory)te;
+        InventoryHelper.addItemStackToInventory(playerIn.inventory.getStackInSlot(playerIn.inventory.currentItem), inv, 0, 0);
+
+        if (heldItem == null || FluidContainerRegistry.getFluidForFilledItem(heldItem) == null || FluidContainerRegistry.getFluidForFilledItem(heldItem).getFluid() == null ) {
             sendText(playerIn, tank, side);
             return false;
         }
 
         // do the thing with the tank and the buckets
-        if (FluidUtil.interactWithTank(heldItem, playerIn, tank, side)) {
+        if (FluidContainerRegistry.getFluidForFilledItem(heldItem).getFluid() == FluidRegistry.WATER && FluidUtil.interactWithTank(heldItem, playerIn, tank, side)) {
             return true;
         } else {
             sendText(playerIn, tank, side);
@@ -90,6 +98,12 @@ public class BlockIronWasher extends BlockTileBase {
             } else {
                 text = "empty";
             }
+            player.addChatMessage(new TextComponentString(text));
+        }
+    }
+
+    private void sendText(EntityPlayer player, String text) {
+        if(player.worldObj.isRemote) {
             player.addChatMessage(new TextComponentString(text));
         }
     }

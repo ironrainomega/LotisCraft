@@ -3,6 +3,7 @@ package com.tamashenning.lotiscraft.common.tileentities.washers;
 import com.tamashenning.lotiscraft.common.inventory.InternalInventory;
 import com.tamashenning.lotiscraft.common.inventory.InventoryOperation;
 import com.tamashenning.lotiscraft.common.tileentities.TileEntityInventoryBase;
+import com.tamashenning.lotiscraft.common.util.LogHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -10,15 +11,23 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.*;
 
 /**
  * Created by ironr on 6/18/2016.
  */
-public class TileEntityIronWasher extends TileEntityInventoryBase implements IFluidHandler {
-    private InternalInventory internalInventory = new InternalInventory(this, 10);
+public class TileEntityIronWasher extends TileEntityInventoryBase implements IFluidHandler, ITickable {
+    private InternalInventory internalInventory = new InternalInventory(this, 1);
 
     FluidTank tank = new FluidTank(4000);
+
+    public void update() {
+        // Okay now, I'm ticking...
+    }
+
+
+    // Inventory stuff...
 
     @Override
     public IInventory getInternalInventory() {
@@ -27,7 +36,7 @@ public class TileEntityIronWasher extends TileEntityInventoryBase implements IFl
 
     @Override
     public void onChangeInventory(IInventory inv, int slot, InventoryOperation operation, ItemStack removed, ItemStack added) {
-
+        LogHelper.info(operation.toString() + " slot: "+String.valueOf(slot));
     }
 
     @Override
@@ -44,6 +53,8 @@ public class TileEntityIronWasher extends TileEntityInventoryBase implements IFl
     public boolean canBeRotated() {
         return true;
     }
+
+    // Liquid stuff...
 
     @Override
     public int fill(EnumFacing from, FluidStack resource, boolean doFill)
